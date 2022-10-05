@@ -22,16 +22,19 @@
  * Copyright (c) Antoine Boulanger (https://github.com/antoineboulanger)
  * Licensed under the ISC License
  */
+
 const babel = require('@babel/core')
 const fs = require('fs')
 const path = require('path')
 
 const pluginBabel = (options = {}) => ({
   name: 'babel',
-  setup(build, { transform } = {}) {
+  setup(build, { transform } = {})
+  {
     const { filter = /.*/, namespace = '', config = {} } = options
 
-    const transformContents = ({ args, contents }) => {
+    const transformContents = ({ args, contents }) =>
+    {
       const babelOptions = babel.loadOptions({
         ...config,
         filename: args.path,
@@ -41,14 +44,22 @@ const pluginBabel = (options = {}) => ({
         },
       })
 
-      if (babelOptions.sourceMaps) {
+      if (!babelOptions)
+      {
+        return
+      }
+
+      if (babelOptions.sourceMaps)
+      {
         const filename = path.relative(process.cwd(), args.path)
 
         babelOptions.sourceFileName = filename
       }
 
-      return new Promise((resolve, reject) => {
-        babel.transform(contents, babelOptions, (error, result) => {
+      return new Promise((resolve, reject) =>
+      {
+        babel.transform(contents, babelOptions, (error, result) =>
+        {
           error ? reject(error) : resolve({ contents: result.code })
         })
       })
@@ -56,7 +67,12 @@ const pluginBabel = (options = {}) => ({
 
     if (transform) return transformContents(transform)
 
-    build.onLoad({ filter, namespace }, async args => {
+    build.onLoad({ filter, namespace }, async args =>
+    {
+      if (/util.inspect/.test(args.path))
+      {
+        args.path += '.js'
+      }
       const contents = await fs.promises.readFile(args.path, 'utf8')
 
       return transformContents({ args, contents })

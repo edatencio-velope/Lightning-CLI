@@ -19,6 +19,8 @@
  * limitations under the License.
  */
 
+process.env.LNG_AUTO_UPDATE = false
+
 // load and parse (optional) .env file with
 require('dotenv').config()
 
